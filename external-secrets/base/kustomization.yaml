@@ -28,15 +28,13 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  #- external-secrets-aws-secret-store.yaml
-  #- external-secrets-gcp-secret-store.yaml
-  #- secret-store.yaml
+  # if this secret is available and the same in all environments put it in base to reduce duplicate config
   #- external-secret.yaml
 
 helmCharts:
   - name: external-secrets
     repo: https://charts.external-secrets.io
-    version: 0.8.1
+    version: 0.9.11
     releaseName: external-secrets
     namespace: external-secrets
     includeCRDs: true

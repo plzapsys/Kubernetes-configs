@@ -43,7 +43,7 @@ on:
 
 env:
   # XXX: https://github.com/wiremind/wiremind-helm-charts/issues/259
-  IGNORE_REGEX: clair/
+  IGNORE_REGEX: clair/|traefik-hub-agent/|rancher/
   DEBUG: ${{ github.event.inputs.debug == true || '' }}
 
 permissions:
@@ -75,13 +75,13 @@ jobs:
           path: bash-tools
 
       - name: Install Helm
-        run: bash-tools/setup/install_helm.sh
+        run: bash-tools/install/install_helm.sh
 
       - name: Helm version
         run: helm version
 
       - name: Install yq
-        run: bash-tools/setup/install_yq.sh
+        run: bash-tools/install/install_yq.sh
 
       - name: yq version
         run: yq --version
@@ -110,7 +110,7 @@ jobs:
       - name: 'Install Helm Charts found in all */base/kustomization.y*ml files to query Kubernetes API to exclude objects at cluster scope'
         run: |
           # XXX: https://github.com/wiremind/wiremind-helm-charts/issues/259
-          kustomizations="$(find . -type f -path '*/*/kustomization.y*ml' | grep -v clair/)"
+          kustomizations="$(find . -type f -path '*/*/kustomization.y*ml' | grep -v "$IGNORE_REGEX")"
           # try twice in case of timeouts
           export SKIP_EXISTING_HELM_INSTALLATIONS=1
           export SKIP_ERRORS=1

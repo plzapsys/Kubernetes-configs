@@ -1,6 +1,6 @@
 #
 #  Author: Hari Sekhon
-#  Date: 2021-02-22 11:12:45 +0000 (Mon, 22 Feb 2021)
+#  Date: 2021-06-09 15:49:46 +0100 (Wed, 09 Jun 2021)
 #
 #  vim:ts=2:sts=2:sw=2:et
 #  lint: k8s
@@ -15,21 +15,19 @@
 #
 
 # ============================================================================ #
-#        J e n k i n s   S e r v e r   D i s c o v e r y   S e r v i c e
+#               A r g o C D   S e t t i n g s   U R L   P a t c h
 # ============================================================================ #
 
 ---
 apiVersion: v1
-kind: Service
+kind: ConfigMap
 metadata:
-  name: jenkins-discovery
-  namespace: jenkins
-spec:
-  clusterIP: None
-  selector:
-    app: jenkins-server
-  ports:
-    - name: jenkins-discovery
-      protocol: TCP
-      port: 50000
-      targetPort: 50000
+  name: argocd-cm
+  namespace: argocd  # breaks kustomize patching of argocd base if using url based install rather than helm, see cm.repos.patch.yaml for details why
+  annotations:
+    checkov.io/skip1: CKV_K8S_21=breaks kustomize patching of base
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd  # necessary for configmap to be picked up my ArgoCD
+data:
+  url: https://argocd.domain.com

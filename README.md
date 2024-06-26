@@ -23,7 +23,6 @@
 [![Validation](https://github.com/HariSekhon/Kubernetes-configs/actions/workflows/validate.yaml/badge.svg)](https://github.com/HariSekhon/Kubernetes-configs/actions/workflows/validate.yaml)
 
 
-[![Datree Kustomize](https://github.com/HariSekhon/Kubernetes-configs/actions/workflows/datree-kustomize.yaml/badge.svg)](https://github.com/HariSekhon/Kubernetes-configs/actions/workflows/datree-kustomize.yaml)
 [![Pluto](https://github.com/HariSekhon/Kubernetes-configs/actions/workflows/pluto.yaml/badge.svg)](https://github.com/HariSekhon/Kubernetes-configs/actions/workflows/pluto.yaml)
 [![Kustomize Nova](https://github.com/HariSekhon/Kubernetes-configs/actions/workflows/kustomize-nova.yaml/badge.svg)](https://github.com/HariSekhon/Kubernetes-configs/actions/workflows/kustomize-nova.yaml)
 [![Checkov](https://github.com/HariSekhon/Kubernetes-configs/actions/workflows/checkov.yaml/badge.svg)](https://github.com/HariSekhon/Kubernetes-configs/actions/workflows/checkov.yaml)
@@ -48,7 +47,16 @@ The sub-directories contain ready-to-run real world apps that I've run across en
 
 Start with [deployment.yaml](https://github.com/HariSekhon/Kubernetes-configs/blob/master/deployment.yaml) / [statefulset.yaml](https://github.com/HariSekhon/Kubernetes-configs/blob/master/statefulset.yaml), for advanced users see [kustomization.yaml](https://github.com/HariSekhon/Kubernetes-configs/blob/master/kustomization.yaml).
 
-The [service.yaml](https://github.com/HariSekhon/Kubernetes-configs/blob/master/service.yaml) contains config for using static public IP and locking down your cloud load balancer's firewall rules eg. to Cloudflare Proxied or VPN IPs only.
+The [service.yaml](https://github.com/HariSekhon/Kubernetes-configs/blob/master/service.yaml) and
+[ingress.yaml](https://github.com/HariSekhon/Kubernetes-configs/blob/master/service.yaml) configs contain settings
+for using static public IP addresses and locking down your cloud load balancer's firewall rules eg. to private IP
+addresses, and patches for Cloudflare Proxied or VPN IPs. You may need to extend those IP lists to your office /
+VPN / public addresses if really want to permit direct internet access to your ingresses and aren't proxying them
+through a WAF in proxied mode etc.
+
+See also the [Dockerfile](https://github.com/HariSekhon/Templates/blob/master/Dockerfile) template in the
+[HariSekhon/Templates](https://github.com/HariSekhon/Templates) repo to containerize your custom apps for deploying
+on to Kubernetes.
 
 
 ## Apps
@@ -99,6 +107,8 @@ See [kustomization.yaml](https://github.com/HariSekhon/Kubernetes-configs/blob/m
 - Pod Security Policies - [pod-security-policy.yaml](https://github.com/HariSekhon/Kubernetes-configs/blob/master/pod-security-policy.yaml)
 - Governance, Security & Best Practices - [Polaris](https://www.fairwinds.com/polaris) ([config](polaris/base/)) for recommendations
 - Find Deprecated API objects to replace - [Pluto](https://pluto.docs.fairwinds.com/) - see [pluto_detect_kustomize_materialize.sh](https://github.com/HariSekhon/DevOps-Bash-tools/blob/master/kubernetes/pluto_detect_kustomize_materialize.sh) and [pluto_detect_kubectl_dump_objects.sh](https://github.com/HariSekhon/DevOps-Bash-tools/blob/master/kubernetes/pluto_detect_kubectl_dump_objects.sh) in the [DevOps Bash Tools](https://github.com/HariSekhon/DevOps-Bash-tools) repo
+- Helm is not IaC idempotent by itself - that is PoC territory - you must wrap it in Kustomize, ArgoCD or similar to detect live drift!
+- Quickly update any Helm Charts in a `kustomization.yaml` file using [kustomize_update_helm_chart_versions.sh](https://github.com/HariSekhon/DevOps-Bash-tools/blob/master/kubernetes/kustomize_update_helm_chart_versions.sh) in the [DevOps Bash Tools](https://github.com/HariSekhon/DevOps-Bash-tools) repo
 
 
 ## Further Documention
@@ -192,7 +202,8 @@ A Kong API Gateway deployment I did for a client using:
 
 A production Jenkins on Kubernetes I built for a client with auto-spawning agents for horizontal scaling and integration with Docker, SonarQube, Clair, Grype and Trivy for code & container scanning.
 
-- [jenkins/base/*.yaml](https://github.com/HariSekhon/Kubernetes-configs/tree/master/jenkins/base)
+- [jenkins/base/*.yaml](https://github.com/HariSekhon/Kubernetes-configs/tree/master/jenkins/base) - core config that is inherited by all environments
+- [jenkins/overlay/*.yaml](https://github.com/HariSekhon/Kubernetes-configs/tree/master/jenkins/overlay) - environment specific settings like ingress address, NFS server mount on agents
 - [claire/base/*.yaml](https://github.com/HariSekhon/Kubernetes-configs/tree/master/clair/base)
 - [sonarqube/base/*.yaml](https://github.com/HariSekhon/Kubernetes-configs/tree/master/sonarqube/base)
 - [trivy/base/*.yaml](https://github.com/HariSekhon/Kubernetes-configs/tree/master/trivy/base)
@@ -204,6 +215,12 @@ A production Jenkins on Kubernetes I built for a client with auto-spawning agent
     - [trivy.groovy](https://github.com/HariSekhon/Jenkins/blob/master/vars/trivy.groovy), [trivyFS.groovy](https://github.com/HariSekhon/Jenkins/blob/master/vars/trivyFS.groovy), [trivyImages](https://github.com/HariSekhon/Jenkins/blob/master/vars/trivyImages.groovy)
     - [gcrDockerAuth.groovy](https://github.com/HariSekhon/Jenkins/blob/master/vars/gcrDockerAuth.groovy), [garDockerAuth.groovy](https://github.com/HariSekhon/Jenkins/blob/master/vars/garDockerAuth.groovy)
     - among others in [vars/](https://github.com/HariSekhon/Jenkins/tree/master/vars) and don't forget about the epic [Jenkinsfile](https://github.com/HariSekhon/Jenkins/blob/master/Jenkinsfile)
+
+#### Useful Notes:
+
+[HariSekhon/Knowledge-Base - Jenkins](https://github.com/HariSekhon/Knowledge-Base/blob/main/jenkins.md)
+
+[HariSekhon/Knowledge-Base - Jenkins-on-Kubernetes](https://github.com/HariSekhon/Knowledge-Base/blob/main/jenkins-on-kubernetes.md)
 
 ![](https://github.com/HariSekhon/Diagrams-as-Code/raw/master/images/jenkins_kubernetes_cicd.svg)
 
@@ -257,6 +274,8 @@ Forked from the [Templates](https://github.com/HariSekhon/Templates) repo.
 - [HashiCorp Packer templates](https://github.com/HariSekhon/Packer-templates) - Linux automated bare-metal installs and portable virtual machines OVA format appliances using HashiCorp Packer, Redhat Kickstart, Debian Preseed and Ubuntu AutoInstaller / Cloud-Init
 
 - [Diagrams-as-Code](https://github.com/HariSekhon/Diagrams-as-Code) - Cloud & Open Source architecture diagrams with Python & D2 source code provided - automatically regenerated via GitHub Actions CI/CD - AWS, GCP, Kubernetes, Jenkins, ArgoCD, Traefik, Kong API Gateway, Nginx, Redis, PostgreSQL, Kafka, Spark, web farms, event processing...
+
+- [Knowledge-Base](https://github.com/HariSekhon/Knowledge-Base) - IT Knowledge Base from 20 years in DevOps, Linux, Cloud, Big Data, AWS, GCP etc.
 
 [![Stargazers over time](https://starchart.cc/HariSekhon/Kubernetes-configs.svg)](https://starchart.cc/HariSekhon/Kubernetes-configs)
 

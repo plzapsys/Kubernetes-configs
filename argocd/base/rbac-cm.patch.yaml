@@ -28,7 +28,7 @@
 #
 # Validate while kubectl context is on k8s cluster where Argo is installed:
 #
-#        curl -sSL https://raw.githubusercontent.com/HariSekhon/DevOps-Bash-tools/master/setup/install_argocd.sh | bash
+#        curl -sSL https://raw.githubusercontent.com/HariSekhon/DevOps-Bash-tools/master/install/install_argocd.sh | bash
 #
 #        argocd admin settings rbac validate --namespace argocd --policy-file rbac-cm.patch.yaml
 
@@ -39,7 +39,7 @@ metadata:
   name: argocd-rbac-cm
   annotations:
     checkov.io/skip1: CKV_K8S_21=breaks kustomize patching of base
-  #namespace: argocd  # breaks kustomize patching of argocd base, see cm.repos.patch.yaml for details why
+  namespace: argocd  # breaks kustomize patching of argocd base if using url based install rather than helm, see cm.repos.patch.yaml for details why
   labels:
     app.kubernetes.io/name: argocd-rbac-cm
     app.kubernetes.io/part-of: argocd  # necessary for configmap to be picked up my ArgoCD
@@ -59,3 +59,12 @@ data:
       # XXX: AAD group usage requires "groupMembershipClaims": "All" in the App Registration manifest
       g, "84ce98d1-e359-4f3b-85af-985b458de3c6", role:org-admin
   scopes: '[roles, email]'
+
+  #policy.default: role:admin
+  # set from role:readonly to role:admin because user wildcard doesn't work:
+  #
+  #   https://github.com/argoproj/argo-cd/issues/17377
+  #
+  #policy.csv: |
+  #  p, *, applications, sync, */*, allow
+  #scopes: '[groups, email]'
