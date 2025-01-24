@@ -25,3 +25,7 @@ kind: Kustomization
 
 resources:
   - ../base
+
+patches:
+  # enable this for dev / staging environments to use internal IP load balancer only
+  #- internal-loadbalancer-service.patch.yaml

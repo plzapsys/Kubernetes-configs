@@ -1,6 +1,6 @@
 #
 #  Author: Hari Sekhon
-#  Date: 2021-02-22 11:19:30 +0000 (Mon, 22 Feb 2021)
+#  Date: 2021-02-22 11:19:11 +0000 (Mon, 22 Feb 2021)
 #
 #  vim:ts=2:sts=2:sw=2:et
 #  lint: k8s
@@ -14,18 +14,15 @@
 #  https://www.linkedin.com/in/HariSekhon
 #
 
-# Binds role granting permissions in teamcity namespace to the teamcity-server serviceaccount to allow Kubernetes Cloud Profile to auto-launch instances within the kubernetes cluster
+# Grant permissions in teamcity namespace to the teamcity-server serviceaccount to allow Kubernetes Cloud Profile to auto-launch instances within the kubernetes cluster
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: Role
 metadata:
-  name: jenkins-server
   namespace: jenkins
-subjects:
-  - kind: ServiceAccount
-    name: jenkins-server
-roleRef:
-  kind: Role
-  name: jenkins-server
-  apiGroup: rbac.authorization.k8s.io
+  name: jenkins
+rules:
+  - apiGroups: ["", "apps"] # "" indicates the core API group
+    resources: ["*"]
+    verbs: ["*"]

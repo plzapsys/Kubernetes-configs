@@ -45,16 +45,20 @@ helmCharts:
     includeCRDs: true
     valuesFile: values.yaml
 
+#patches:
+#  # overrides the random generated initial admin password to stop ArgoCD constantly replacing the secret
+#  # XXX: change the pw in here if using this
+#  - path: initial-admin-secret.patch.yaml
+
 # Older - Helm chart above has more automation with plugin management and JCasC (Jenkins Configuration as Code) with auto-reload
 #
 #resources:
 #  # only enable this if using permanent agents on k8s, otherwise see jenkins-agent-pod.yaml for dynamic auto-scaling on k8s
 #  #- jenkins-agent.yaml
-#  - jenkins-agent-serviceaccount.yaml
-#  - jenkins-ingress.yaml
-#  - jenkins-server-role.yaml
-#  - jenkins-server-rolebinding.yaml
-#  - jenkins-server-serviceaccount.yaml
-#  - jenkins-server.yaml
-#  - jenkins-service-discovery.yaml
-#  - jenkins-service-ui.yaml
+#  - agent-serviceaccount.yaml
+#  - server-role.yaml
+#  - server-rolebinding.yaml
+#  - server-serviceaccount.yaml
+#  - server.yaml
+#  - service-discovery.yaml
+#  - service-ui.yaml
